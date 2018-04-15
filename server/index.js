@@ -14,9 +14,21 @@ function handleRequest(req, res) {
 
 	console.log("Output " + url);
 	let stream = fs.createReadStream(url);
-	stream.on("error", () => {
-		res.writeHead(404, "File not found");
-		res.end(":(");
+	stream.on("error", e => {
+		if(e.code == "EISDIR") {
+			fs.readdir(url, (e, dir) => {
+				if(e) {
+					res.writeHead(500, "Server error");
+					res.end(":'(");
+					return;
+				}
+
+				res.end("{DIR}\n" + dir.join("\n"));
+			});
+		} else {
+			res.writeHead(404, "File not found");
+			res.end(":(");
+		}
 	});
 	stream.pipe(res);
 }
