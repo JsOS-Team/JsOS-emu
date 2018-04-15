@@ -48,15 +48,19 @@ class Keyboard {
 			"ShiftRight"  : "rightshift",
 			"AltLeft"     : "leftalt",
 			"ScrollLock"  : "scrllock",
-			"ArrowUp"     : "up",
-			"ArrowLeft"   : "left",
-			"ArrowRight"  : "right",
-			"ArrowDown"   : "down",
+			"ArrowUp"     : "kpup",
+			"ArrowLeft"   : "kpleft",
+			"ArrowRight"  : "kpright",
+			"ArrowDown"   : "kpdown",
 			"Delete"      : "kpdel",
 			"ControlRight": "rightctrl",
 			"AltRight"    : "rightalt",
 			"Delete"      : "del",
-			"ContextMenu" : "menu"
+			"ContextMenu" : "menu",
+			"PageUp"      : "kppageup",
+			"PageDown"    : "kppagedown",
+			"Home"        : "kphome",
+			"End"         : "kpend"
 		}[e.code] || e.code.toLowerCase();
 
 		return {
