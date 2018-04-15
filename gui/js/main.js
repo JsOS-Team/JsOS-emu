@@ -11,9 +11,18 @@ function connect() {
 	return get("_port")
 		.then(wsPort => {
 			ws = new WebSocket(`ws://localhost:${wsPort}`);
+
+			return new Promise((resolve, reject) => {
+				ws.onopen = resolve;
+				ws.onerror = reject;
+			});
 		});
 }
 
 function sendWs(msg) {
 	ws.send(JSON.stringify(msg));
 }
+
+
+// Connect as soon as possible
+connect().then(() => sendWs("begin"));
