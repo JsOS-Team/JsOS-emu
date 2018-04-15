@@ -1,11 +1,69 @@
-class Printer {
-	constructor(buffer) {
-		this.buffer = buffer;
-		this.posCurrent = 0;
+class VGABuffer {
+	constructor(backend) {
+		this._backend = backend;
+
 		this.w = 80;
 		this.h = 25;
+		this.color = {
+			"BLACK": 0,
+			"BLUE": 1,
+			"GREEN": 2,
+			"CYAN": 3,
+			"RED": 4,
+			"MAGENTA": 5,
+			"BROWN": 6,
+			"LIGHTGRAY": 7,
+			"DARKGRAY": 8,
+			"LIGHTBLUE": 9,
+			"LIGHTGREEN": 10,
+			"LIGHTCYAN": 11,
+			"LIGHTRED": 12,
+			"LIGHTMAGNTA": 13,
+			"YELLOW": 14,
+			"WHITE": 15
+		};
+	}
 
-		this.refresh = this.refresh.bind(this);
+	setOffset(u8, offset, char, fg, bg) {
+		if(offset < 0 || offset >= this.w * this.h) {
+			throw new Error("vga error: offset is out of bounds");
+		}
+
+		let x = offset % this.w;
+		let y = Math.floor(offset / this.w);
+		this._backend.send({action: "setCharXY", x, y, char, fg, bg});
+	}
+
+	setXY(u8, x, y, char, fg, bg) {
+		if(x < 0 || x >= this.w) {
+			throw new Error("vga error: x is out of bounds");
+		} else if(y < 0 || y >= this.h) {
+			throw new Error("vga error: y is out of bounds");
+		}
+
+		this._backend.send({action: "setCharXY", x, y, char, fg, bg});
+	}
+
+	clear(bg) {
+		this._backend.send({action: "clear", bg});
+	}
+
+	scrollUp(bg) {
+		this._backend.send({action: "scrollUp", bg});
+	}
+	scrollDown(bg) {
+		this._backend.send({action: "scrollDown", bg});
+	}
+};
+
+
+class Printer extends VGABuffer {
+	constructor(backend) {
+		super(backend);
+
+		this._backend = backend;
+		this.posCurrent = 0;
+
 		this.scrollUp = this.scrollUp.bind(this);
 		this.scrollDown = this.scrollDown.bind(this);
 		this.clear = this.clear.bind(this);
@@ -14,8 +72,7 @@ class Printer {
 		this.moveOffset = this.moveOffset.bind(this);
 		this.moveTo = this.moveTo.bind(this);
 		this.useControls = this.useControls.bind(this);
-		this.buffer.clear(this.color.BLACK);
-		this.refresh();
+		super.clear(this.color.BLACK);
 	}
 
 	refresh() {
@@ -24,16 +81,16 @@ class Printer {
 
 	// Найдите десять отличий
 	scrollUp() {
-		this.buffer.scrollUp(this.color.BLACK);
+		super.scrollUp(this.color.BLACK);
 		this.posCurrent -= this.w;
 	}
 	scrollDown() {
-		this.buffer.scrollDown(this.color.BLACK);
+		super.scrollDown(this.color.BLACK);
 		this.posCurrent -= this.w;
 	}
 
 	clear(color=this.color.BLACK) {
-		this.buffer.clear(color);
+		super.clear(color);
 		this.posCurrent = 0;
 	}
 
@@ -77,7 +134,7 @@ class Printer {
 					this.scrollUp();
 				}
 				if(c !== "\n") {
-					this.buffer.setOffset(this.posCurrent++, c, ...currentcolor);
+					this.setOffset(this.posCurrent++, c, ...currentcolor);
 				}
 			}
 		}
@@ -117,7 +174,7 @@ class Printer {
 
 class TTY extends Printer {
 	constructor(backend, keyboard) {
-		super(new VGABuffer);
+		super(backend);
 
 		this._backend = backend;
 		this._keyboard = keyboard;
@@ -238,13 +295,6 @@ class TTY extends Printer {
 
 class StdioInterface {
 	constructor() {
-		this.onread = () => {};
-		this.onwrite = () => {};
-		this.onwriteerror = () => {};
-		this.onsetcolor = () => {};
-		this.onsetbackgroundcolor = () => {};
-		this.onmoveto = () => {};
-
 		this.write = this.write.bind(this);
 		this.writeError = this.writeError.bind(this);
 		this.writeLine = this.writeLine.bind(this);
@@ -254,12 +304,15 @@ class StdioInterface {
 		this.read = this.read.bind(this);
 		this.readLine = this.readLine.bind(this);
 	}
+	onread() {}
+	onwrite() {}
+	onwriteerror() {}
+	onsetcolor() {}
+	onsetbackgroundcolor() {}
+	onmoveto() {}
 
 	get color() {
 		return this.getColor();
-	}
-	get bgcolor() {
-		return this.getBgColor();
 	}
 
 	// stdout
