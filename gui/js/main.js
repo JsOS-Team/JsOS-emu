@@ -26,3 +26,6 @@ function sendWs(msg) {
 
 // Connect as soon as possible
 connect().then(() => sendWs("begin"));
+
+let table = document.getElementById("vga");
+let vga = new VGA(table);

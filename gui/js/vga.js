@@ -1,3 +1,6 @@
+const w = 80;
+const h = 25;
+
 const color = {
 	"BLACK": "#000",
 	"BLUE": "#008",
