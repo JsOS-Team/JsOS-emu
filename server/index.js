@@ -1,11 +1,14 @@
 const http = require("http");
+const WebSocket = require("ws");
 const path = require("path");
 const fs = require("fs");
 
-let port, wsPort;
+let port, wsPort, backend;
 
 
 function handleRequest(req, res) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+
 	let url = req.url;
 	if(url.indexOf("..") > -1) {
 		res.writeHead(403, "Forbidden");
@@ -41,7 +44,16 @@ function handleRequest(req, res) {
 	stream.pipe(res);
 }
 
-function run() {
+function handleWebSocket(ws) {
+	console.log("Connected to WebSocket");
+
+	ws.on("message", msg => backend.recv(msg));
+	backend.send = msg => backend.send(msg);
+}
+
+function run(b) {
+	backend = b;
+
 	// Choose random port, so that noone can steal local files from Web
 	port = Math.floor(Math.random() * 3000) + 2000;
 	wsPort = Math.floor(Math.random() * 3000) + 2000;
@@ -49,6 +61,7 @@ function run() {
 	console.log("Listening websocket on port " + wsPort);
 
 	http.createServer(handleRequest).listen(port);
+	new WebSocket.Server({port: wsPort}).on("connection", handleWebSocket);
 }
 
 module.exports = run;
