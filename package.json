@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/imachug/JsOS-emu/issues"
   },
-  "homepage": "https://github.com/imachug/JsOS-emu#readme"
+  "homepage": "https://github.com/imachug/JsOS-emu#readme",
+  "dependencies": {
+    "ws": "^5.1.1"
+  }
 }
