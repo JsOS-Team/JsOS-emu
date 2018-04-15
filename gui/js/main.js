@@ -29,3 +29,4 @@ connect().then(() => sendWs("begin"));
 
 let table = document.getElementById("vga");
 let vga = new VGA(table);
+let keyboard = new Keyboard(document.body);
