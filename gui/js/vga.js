@@ -67,7 +67,7 @@ class VGA {
 		parent.appendChild(tr);
 
 		for(let x = 0; x < w; x++) {
-			setCharXY(this.table, x, h - 1, " ", bg, bg);
+			setCharAt(this.table, x, h - 1, " ", bg, bg);
 		}
 	}
 	scrollDown(bg) {
