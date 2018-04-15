@@ -47,8 +47,8 @@ function handleRequest(req, res) {
 function handleWebSocket(ws) {
 	console.log("Connected to WebSocket");
 
-	ws.on("message", msg => backend.recv(msg));
-	backend.send = msg => backend.send(msg);
+	ws.on("message", msg => backend.recv(JSON.parse(msg)));
+	backend.send = msg => backend.send(JSON.stringify(msg));
 }
 
 function run(b) {

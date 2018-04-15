@@ -15,5 +15,5 @@ function connect() {
 }
 
 function sendWs(msg) {
-	ws.send(msg);
+	ws.send(JSON.stringify(msg));
 }
