@@ -1,0 +1,2 @@
+// Run server
+require("./server")();
