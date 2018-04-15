@@ -2,22 +2,22 @@ const w = 80;
 const h = 25;
 
 const color = {
-	"BLACK": "#000",
-	"BLUE": "#008",
-	"GREEN": "#080",
-	"CYAN": "#088",
-	"RED": "#800",
-	"MAGENTA": "#808",
-	"BROWN": "#880",
-	"LIGHTGRAY": "#888",
-	"DARKGRAY": "#666",
-	"LIGHTBLUE": "#00F",
-	"LIGHTGREEN": "#0F0",
-	"LIGHTCYAN": "#0FF",
-	"LIGHTRED": "#F00",
-	"LIGHTMAGENTA": "#F0F",
-	"YELLOW": "#FF0",
-	"WHITE": "#FFF"
+	0 : "#000",
+	1 : "#008",
+	2 : "#080",
+	3 : "#088",
+	4 : "#800",
+	5 : "#808",
+	6 : "#880",
+	7 : "#888",
+	8 : "#666",
+	9 : "#00F",
+	10: "#0F0",
+	11: "#0FF",
+	12: "#F00",
+	13: "#F0F",
+	14: "#FF0",
+	15: "#FFF"
 };
 
 function setCharAt(table, x, y, char, fg, bg) {
