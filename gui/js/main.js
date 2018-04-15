@@ -1,5 +1,4 @@
-// TODO: don't get port via prompt
-const port = parseInt(location.search.substr(1));
+const port = 7505;
 
 
 // Connect to websocket

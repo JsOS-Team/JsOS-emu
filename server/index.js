@@ -1,5 +1,6 @@
 const WebSocket = require("ws");
 const browserOpen = require("../utils/openBrowser");
+const path = require("path");
 
 let backend;
 
@@ -11,23 +12,18 @@ function handleWebSocket(ws) {
 	backend.send = msg => ws.send(JSON.stringify(msg));
 }
 
-// Choose random port, so that noone can steal local files from Web
-function getPort() {
-	return Number(process.argv[2]) || Math.floor(Math.random() * 3000) + 2000;
-}
-
 
 module.exports = b => {
-	const port = getPort()
-	const url = `file:///${__dirname}/../gui/index.html?${port}`;
+	const port = 7505;
+	const url = `file:///${path.resolve(__dirname, "../gui/index.html")}`;
 
 	backend = b;
 
 	console.log("Listening on port " + port);
-	console.log(url);
+	console.log("Opening " + url);
 
 
-	browserOpen(`http://localhost:${port}`);
+	browserOpen(url);
 
 	new WebSocket.Server({port}).on("connection", handleWebSocket);
 
