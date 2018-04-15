@@ -24,7 +24,7 @@ class VGABuffer {
 		};
 	}
 
-	setOffset(u8, offset, char, fg, bg) {
+	setOffset(offset, char, fg, bg) {
 		if(offset < 0 || offset >= this.w * this.h) {
 			throw new Error("vga error: offset is out of bounds");
 		}
@@ -32,7 +32,7 @@ class VGABuffer {
 		this._backend.send({action: "setOffset", offset, char, fg, bg});
 	}
 
-	setXY(u8, x, y, char, fg, bg) {
+	setXY(x, y, char, fg, bg) {
 		if(x < 0 || x >= this.w) {
 			throw new Error("vga error: x is out of bounds");
 		} else if(y < 0 || y >= this.h) {
