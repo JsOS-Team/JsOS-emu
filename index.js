@@ -1,2 +1,5 @@
+let app = process.argv[2] || "chrome";
+
 // Run server
-require("./server")(require("./server/backend"));
+let port = require("./server")(require("./server/backend"));
+require("opn")(`file://${__dirname}/gui/index.html?${port}`, {app});

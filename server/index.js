@@ -18,4 +18,6 @@ module.exports = b => {
 	console.log("Listening on port " + port);
 
 	new WebSocket.Server({port: port}).on("connection", handleWebSocket);
-}
+
+	return port;
+};
