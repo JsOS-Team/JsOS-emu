@@ -3,3 +3,5 @@ class Backend {
 		console.log("Recv", msg);
 	}
 };
+
+module.exports = new Backend;
