@@ -1,3 +1,166 @@
+class LineEditor {
+	constructor(printer) {
+		this._printer = printer;
+
+		this.inputText = "";
+		this.inputPosition = 0;
+	}
+
+	getText() {
+		return this.inputText;
+	}
+
+	drawCursor() {
+		let char = " ";
+
+		if(this.inputPosition < this.inputText.length) {
+			char = this.inputText[this.inputPosition];
+		}
+
+		this._printer.print(char, 1, this._printer.color.WHITE, this._printer.color.LIGHTGREEN);
+		this._printer.moveOffset(-1);
+	}
+
+	removeCursor() {
+		let char = " ";
+
+		if (this.inputPosition < this.inputText.length) {
+			char = this.inputText[this.inputPosition];
+		}
+
+		this._printer.print(char, 1, this._printer.color.WHITE, this._printer.color.BLACK);
+		this._printer.moveOffset(-1);
+	}
+
+	putChar(char) {
+		this.removeCursor();
+		if(this.inputPosition >= this.inputText.length) {
+			this.inputText += char;
+			this._printer.print(char);
+		} else {
+			const rightSide = this.inputText.slice(this.inputPosition);
+
+			this.inputText = this.inputText.slice(0, this.inputPosition) + char + rightSide;
+			this._printer.print(char);
+			for(const item of rightSide) {
+				this._printer.print(item);
+			}
+			this._printer.moveOffset(-rightSide.length);
+		}
+		this.inputPosition++;
+		this.drawCursor();
+	}
+
+	removeChar() {
+		if(this.inputPosition > 0) {
+			this.removeCursor();
+			if(this.inputPosition >= this.inputText.length) {
+				this.inputText = this.inputText.slice(0, -1);
+				this._printer.moveOffset(-1);
+			} else {
+				const rightSide = this.inputText.slice(this.inputPosition);
+
+				this.inputText = this.inputText.slice(0, this.inputPosition - 1) + rightSide;
+				this._printer.moveOffset(-1);
+				for(const item of rightSide) {
+					this._printer.print(item);
+				}
+				this._printer.print(" ");
+				this._printer.moveOffset(-rightSide.length - 1);
+			}
+			this.inputPosition--;
+			this.drawCursor();
+		}
+	}
+
+	removeCharRight() {
+		if(this.inputPosition < this.inputText.length) {
+			this.removeCursor();
+			this.moveCursorRight();
+			this.removeChar();
+			this.drawCursor();
+		}
+	}
+	moveCursorLeft(num = 1) {
+		if(this.inputPosition - 3 < 0) {
+			num = this.inputPosition;
+		}
+
+		this.removeCursor();
+		this.inputPosition -= num;
+		this._printer.moveOffset(-num);
+		this.drawCursor();
+	}
+
+	moveCursorRight(num = 1) {
+		if (this.inputPosition + num >= this.inputText.length) num = this.inputText.length - this.inputPosition;
+
+		this.removeCursor();
+		this.inputPosition += num;
+		this._printer.moveOffset(num);
+		this.drawCursor();
+	}
+
+	moveCursorStart() {
+		this.removeCursor();
+		if (this.inputPosition > 0) {
+			this.moveCursorLeft(this.inputPosition);
+		}
+		this.drawCursor();
+	}
+
+	moveCursorEnd() {
+		this.removeCursor();
+		if(this.inputPosition < this.inputText.length) {
+			this.moveCursorRight(this.inputText.length);
+		}
+		this.drawCursor();
+	}
+
+	writeHistory(cmd) {
+		LineEditor.history.push(cmd);
+		LineEditor.historyPosition = LineEditor.history.length;
+	}
+
+	previous() {
+		if(LineEditor.historyPosition > 0) {
+			LineEditor.historyPosition--;
+			this.setInputBox(LineEditor.history[LineEditor.historyPosition] || '');
+		}
+	}
+
+	next() {
+		if(LineEditor.historyPosition < LineEditor.history.length) {
+			LineEditor.historyPosition++;
+			this.setInputBox(LineEditor.history[LineEditor.historyPosition] || '');
+		}
+	}
+
+	clearInputBox() {
+		if(this.inputPosition < this.inputText.length) {
+			this.moveCursorRight(this.inputText.length);
+		}
+		while(this.inputPosition > 0) {
+			this.removeChar(); // TODO: slice
+		}
+	}
+
+	setInputBox(text) {
+		this.removeCursor();
+		this.clearInputBox();
+		for(const char of text) {
+			this.inputText += char;
+			this._printer.print(char);
+			++this.inputPosition;
+		}
+		this.drawCursor();
+	}
+};
+
+LineEditor.history = [];
+LineEditor.historyPosition = 0;
+
+
 class VGABuffer {
 	constructor(backend) {
 		this._backend = backend;
@@ -185,7 +348,7 @@ class TTY extends Printer {
 			throw new Error("nested terminal read is not allowed");
 		}
 
-		const editor = new LineEditor();
+		const editor = new LineEditor(this);
 
 		this.isReading = true;
 
@@ -200,7 +363,7 @@ class TTY extends Printer {
 					break;
 				case "enter":
 					printer.print('\n');
-					isReading = false;
+					this.isReading = false;
 					setTimeout(() => cb('\n'), 0);
 					this._keyboard.onKeydown.remove(addinput);
 					break;
@@ -218,11 +381,11 @@ class TTY extends Printer {
 			throw new Error("nested terminal read is not allowed");
 		}
 
-		const editor = new LineEditor();
+		const editor = new LineEditor(this);
 
 		this.isReading = true;
 
-		function addinput(keyinfo) {
+		const addinput = keyinfo => {
 			switch(keyinfo.type) {
 				case "kpleft":
 					editor.moveCursorLeft();
@@ -243,10 +406,10 @@ class TTY extends Printer {
 					editor.moveCursorEnd();
 					break;
 				case "kppageup":
-					printer.scrollUp(0);
+					this.scrollUp(0);
 					break;
 				case "kppagedown":
-					printer.scrollDown(0);
+					this.scrollDown(0);
 					break;
 				case "character":
 					editor.putChar(keyinfo.character);
@@ -259,8 +422,8 @@ class TTY extends Printer {
 					break;
 				case "enter":
 					editor.removeCursor();
-					printer.print('\n');
-					isReading = false;
+					this.print("\n");
+					this.isReading = false;
 					setTimeout(() => {
 						let text = editor.getText();
 
@@ -274,7 +437,7 @@ class TTY extends Printer {
 							} catch (e) {
 								result = `\nError: ${e}\n`;
 							}
-							printer.print(result);
+							this.print(result);
 							return cb("");
 						}
 						return cb(editor.getText());
