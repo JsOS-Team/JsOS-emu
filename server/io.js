@@ -116,7 +116,92 @@ class TTY {
 	};
 };
 
-module.exports = StdIO;
+
+class StdioInterface {
+	constructor() {
+		this.onread = () => {};
+		this.onwrite = () => {};
+		this.onwriteerror = () => {};
+		this.onsetcolor = () => {};
+		this.onsetbackgroundcolor = () => {};
+		this.onmoveto = () => {};
+
+		this.write = this.write.bind(this);
+		this.writeError = this.writeError.bind(this);
+		this.writeLine = this.writeLine.bind(this);
+		this.setColor = this.setColor.bind(this);
+		this.setBackgroundColor = this.setBackgroundColor.bind(this);
+		this.clear = this.clear.bind(this);
+		this.read = this.read.bind(this);
+		this.readLine = this.readLine.bind(this);
+	}
+
+	get color() {
+		return this.getColor();
+	}
+	get bgcolor() {
+		return this.getBgColor();
+	}
+
+	// stdout
+	write(...text) {
+		this.onwrite(text.join(" "));
+	}
+	writeLine(...text) {
+		this.onwrite(`${text.join(" ")}\n`);
+	}
+	setColor(fg) {
+		this.onsetcolor(fg);
+	}
+	setBackgroundColor(bg) {
+		this.onsetbackgroundcolor(bg);
+	}
+	moveTo(x, y) {
+		this.onmoveto(x, y);
+	}
+	clear() {
+		this.onclear();
+	}
+
+	// stdin
+	read(cb) {
+		this.onread(cb);
+	}
+	readLine(cb) {
+		// If there's onreadline, use it.
+		if(this.onreadline) {
+			this.onreadline(cb);
+		} else {
+			// Else, use onread.
+			// Downside: no cusor moving or backspace.
+			// TODO: Fix downside.
+
+			let text = "";
+
+			function addinput(char) {
+				if(char !== "\n") {
+					text += char;
+					this.onread(addinput);
+				} else {
+					cb(text);
+				}
+			}
+			this.onread(addinput);
+		}
+	}
+
+	// stderr
+	writeError(...text) {
+		this.write("\n");
+		if(typeof text[0] === "string") {
+			this.onwriteerror(text.join(" "));
+		} else {
+			this.onwriteerror(text[0].stack);
+		}
+		this.setColor("green");
+		this.write("\n>>");
+	}
+};
 
 
 
