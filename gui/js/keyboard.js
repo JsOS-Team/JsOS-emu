@@ -8,16 +8,16 @@ class Keyboard {
 		this.listeners = {keydown: [], keyup: []};
 	}
 
-	onkeydown(f) {
+	onKeydown(f) {
 		this.listeners.keydown.push(f);
 	}
-	offkeydown(f) {
+	offKeydown(f) {
 		this.listeners.keydown.splice(this.listeners.keydown.indexOf(f), 1);
 	}
-	onkeyup(f) {
+	onKeyup(f) {
 		this.listeners.keyup.push(f);
 	}
-	offkeyup(f) {
+	offKeyup(f) {
 		this.listeners.keyup.splice(this.listeners.keyup.indexOf(f), 1);
 	}
 

@@ -25,8 +25,16 @@ function sendWs(msg) {
 
 
 // Connect as soon as possible
-connect().then(() => sendWs("begin"));
+connect().then(() => {
+	sendWs("begin");
 
-let table = document.getElementById("vga");
-let vga = new VGA(table);
-let keyboard = new Keyboard(document.body);
+	let table = document.getElementById("vga");
+	let vga = new VGA(table);
+	let keyboard = new Keyboard(document.body);
+	keyboard.onKeydown(char => {
+		sendWs({action: "keydown", char});
+	});
+	keyboard.onKeyup(char => {
+		sendWs({action: "keyup", char});
+	});
+});
