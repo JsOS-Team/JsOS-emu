@@ -6,6 +6,13 @@ class Backend {
 			this.app = require("../app");
 			this.api = new API(this);
 
+			global.$$ = {
+				stdio: {
+					defaultStdio: this.api.stdio
+				}
+			};
+			global.debug = console.log.bind(console);
+
 			let command = this.app.commands[0];
 			this.app.call(command, "", this.api, this.cb);
 		} else {
