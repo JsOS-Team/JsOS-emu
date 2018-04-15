@@ -2,6 +2,9 @@ const http = require("http");
 const path = require("path");
 const fs = require("fs");
 
+let port, wsPort;
+
+
 function handleRequest(req, res) {
 	let url = req.url;
 	if(url.indexOf("..") > -1) {
@@ -11,6 +14,11 @@ function handleRequest(req, res) {
 	}
 
 	url = path.join(".", url);
+
+	if(url == "_port") {
+		res.end(wsPort.toString());
+		return;
+	}
 
 	console.log("Output " + url);
 	let stream = fs.createReadStream(url);
@@ -35,8 +43,10 @@ function handleRequest(req, res) {
 
 function run() {
 	// Choose random port, so that noone can steal local files from Web
-	let port = Math.floor(Math.random() * 3000) + 2000;
+	port = Math.floor(Math.random() * 3000) + 2000;
+	wsPort = Math.floor(Math.random() * 3000) + 2000;
 	console.log("Listening on port " + port);
+	console.log("Listening websocket on port " + wsPort);
 
 	http.createServer(handleRequest).listen(port);
 }
