@@ -205,7 +205,60 @@ class StdioInterface {
 
 
 
-class StdIO extends TTY {
+class StdIO extends StdioInterface {
+	constructor(backend, keyboard) {
+		super();
+
+		this.tty = new TTY(backend, keyboard);
+
+		this.fgcolor = this.tty.color.WHITE;
+		this.bgcolor = this.tty.color.BLACK;
+	}
+
+	onwrite(text) {
+		this.tty.print(text, 1, this.fgcolor, this.bgcolor);
+	}
+	onclear() {
+		this.tty.clear();
+	}
+	onsetcolor(fg) {
+		if(!fg) {
+			this.fgcolor = this.tty.color.WHITE;
+			return;
+		}
+
+		this.fgcolor = this.tty.color[String(fg).toUpperCase()];
+	}
+	onsetbackgroundcolor(bg) {
+		if(!bg) {
+			this.bgcolor = this.tty.color.BLACK;
+			return;
+		}
+
+		this.bgcolor = this.tty.color[String(bg).toUpperCase()];
+	}
+	onmoveto(x, y) {
+		this.tty.moveTo(x, y);
+	}
+	onread(cb) {
+		this.tty.read(cb);
+	}
+	onreadline(cb) {
+		this.tty.readLine(cb);
+	}
+	onwriteerror(error) {
+		this.tty.print(error, 1, this.tty.color.RED);
+	}
+	print(...args) {
+		this.onwrite(...args);
+	}
+
+	getColor() {
+		return this.fgcolor;
+	}
+	getBgColor() {
+		return this.bgcolor;
+	}
 };
 
 module.exports = StdIO;
