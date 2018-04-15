@@ -1,5 +1,5 @@
 // TODO: don't get port via prompt
-const port = parseInt(prompt("WebSocket port:"));
+const port = parseInt(location.search.substr(1));
 
 
 // Connect to websocket
