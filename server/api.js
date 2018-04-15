@@ -11,24 +11,24 @@ class API {
 
 		this.keyboard = {
 			onKeydown: {
-				add(f) {
+				add: f => {
 					this.handlers.onKeydown.push(f);
 				},
-				remove(f) {
+				remove: f => {
 					this.handlers.onKeydown.splice(this.handlers.onKeydown.indexOf(f), 1);
 				},
-				dispatch(...args) {
+				dispatch: (...args) => {
 					this.handlers.onKeydown.forEach(f => f(...args));
 				}
 			},
 			onKeyup: {
-				add(f) {
+				add: f => {
 					this.handlers.onKeyup.push(f);
 				},
-				remove(f) {
+				remove: f => {
 					this.handlers.onKeyup.splice(this.handlers.onKeyup.indexOf(f), 1);
 				},
-				dispatch(...args) {
+				dispatch: (...args) => {
 					this.handlers.onKeyup.forEach(f => f(...args));
 				}
 			}
@@ -39,7 +39,11 @@ class API {
 	}
 
 	recv(msg) {
-
+		if(msg.action == "keydown") {
+			this.keyboard.onKeydown.dispatch(msg.char);
+		} else if(msg.action == "keyup") {
+			this.keyboard.onKeyup.dispatch(msg.char);
+		}
 	}
 };
 
