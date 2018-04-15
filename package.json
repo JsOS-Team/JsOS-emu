@@ -1,0 +1,22 @@
+{
+  "name": "jsos-emu",
+  "version": "1.0.0",
+  "description": "JsOS application emulator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imachug/JsOS-emu.git"
+  },
+  "keywords": [
+    "jsos"
+  ],
+  "author": "Ivanq",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/imachug/JsOS-emu/issues"
+  },
+  "homepage": "https://github.com/imachug/JsOS-emu#readme"
+}
