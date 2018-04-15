@@ -329,8 +329,8 @@ class StdioInterface {
 	moveTo(x, y) {
 		this.onmoveto(x, y);
 	}
-	clear() {
-		this.onclear();
+	clear(bg) {
+		this.onclear(bg);
 	}
 
 	// stdin
@@ -388,8 +388,8 @@ class StdIO extends StdioInterface {
 	onwrite(text) {
 		this.tty.print(text, 1, this.fgcolor, this.bgcolor);
 	}
-	onclear() {
-		this.tty.clear();
+	onclear(bg) {
+		this.tty.clear(bg);
 	}
 	onsetcolor(fg) {
 		if(!fg) {
