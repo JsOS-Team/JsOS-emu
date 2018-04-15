@@ -28,23 +28,6 @@ switch(process.platform) {
 
 function open(url, callback) {
     var child = spawn(command, [url]);
-    var errorText = "";
-    child.stderr.setEncoding('utf8');
-    child.stderr.on('data', function (data) {
-        errorText += data;
-    });
-    child.stderr.on('end', function () {
-        if (errorText.length > 0) {
-            var error = new Error(errorText);
-            if (callback) {
-                callback(error);
-            } else {
-                throw error;
-            }
-        } else if (callback) {
-            callback(error);
-        }
-    });
 }
 
 module.exports = open;
