@@ -1,7 +1,24 @@
 const http = require("http");
+const path = require("path");
+const fs = require("fs");
 
 function handleRequest(req, res) {
-	res.end("Hello!");
+	let url = req.url;
+	if(url.indexOf("..") > -1) {
+		res.writeHead(403, "Forbidden");
+		res.end("Don't use ..");
+		return;
+	}
+
+	url = path.join(".", url);
+
+	console.log("Output " + url);
+	let stream = fs.createReadStream(url);
+	stream.on("error", () => {
+		res.writeHead(404, "File not found");
+		res.end(":(");
+	});
+	stream.pipe(res);
 }
 
 function run() {
