@@ -1,5 +1,124 @@
-class TTY {
+class Printer {
+	constructor(buffer) {
+		this.buffer = buffer;
+		this.posCurrent = 0;
+		this.w = 80;
+		this.h = 25;
+
+		this.refresh = this.refresh.bind(this);
+		this.scrollUp = this.scrollUp.bind(this);
+		this.scrollDown = this.scrollDown.bind(this);
+		this.clear = this.clear.bind(this);
+		this.fill = this.fill.bind(this);
+		this.print = this.print.bind(this);
+		this.moveOffset = this.moveOffset.bind(this);
+		this.moveTo = this.moveTo.bind(this);
+		this.useControls = this.useControls.bind(this);
+		this.buffer.clear(this.color.BLACK);
+		this.refresh();
+	}
+
+	refresh() {
+		// Does nothing in emulation mode, content already refreshed
+	}
+
+	// Найдите десять отличий
+	scrollUp() {
+		this.buffer.scrollUp(this.color.BLACK);
+		this.posCurrent -= this.w;
+	}
+	scrollDown() {
+		this.buffer.scrollDown(this.color.BLACK);
+		this.posCurrent -= this.w;
+	}
+
+	clear(color=this.color.BLACK) {
+		this.buffer.clear(color);
+		this.posCurrent = 0;
+	}
+
+	fill(color) {
+		return this.clear(color);
+	}
+
+	useControls(symbol, prevsymbol="\0", setcolor=[this.color.WHITE, this.color.BLACK]) {
+		const code = symbol.charCodeAt(0);
+
+		if(code >= 0x0 && code <= 0xF && prevsymbol.charCodeAt() === 0x1B) {
+			setcolor[0] = code;
+			return true;
+		}
+
+		if(code >= 0x10 && code <= 0x1F && prevsymbol.charCodeAt() === 0x1B) {
+			setcolor[1] = code - 0x10;
+			return true;
+		}
+
+		return code === 0x1B;
+	}
+
+	print(textOpt="", repeat=1, fg=this.color.WHITE, bg=this.color.BLACK) {
+		const text = String(textOpt);
+		const currentcolor = [fg, bg];
+
+		for(let j = 0; j < repeat; j++) {
+			for(const i in text) {
+				const c = text[i];
+
+				if(this.useControls(c, text[i - 1], currentcolor)) {
+					continue;
+				}
+
+				if(c === "\n") {
+					this.posCurrent -= this.posCurrent % this.w;
+					this.posCurrent += this.w;
+				}
+				if(this.posCurrent >= this.w * this.h) {
+					this.scrollUp();
+				}
+				if(c !== "\n") {
+					this.buffer.setOffset(this.posCurrent++, c, ...currentcolor);
+				}
+			}
+		}
+	}
+
+	moveOffset(offsetOpt) {
+		const offset = offsetOpt | 0;
+		let newPos = this.posCurrent + offset;
+
+		if(newPos < 0) {
+			newPos = 0;
+		} else if(newPos >= this.w * this.h) {
+			newPos = (this.w * this.h) - 1;
+		}
+
+		this.posCurrent = newPos;
+	}
+
+	moveTo(xOpt, yOpt) {
+		let x = xOpt;
+		let y = yOpt;
+
+		if(x < 0) {
+			x = 0;
+		} else if(x >= this.w) {
+			x = this.w - 1;
+		}
+		if(y < 0) {
+			y = 0;
+		} else if(y >= this.h) {
+			y = this.h - 1;
+		}
+		this.posCurrent = (y * this.w) + x;
+	}
+}
+
+
+class TTY extends Printer {
 	constructor(backend, keyboard) {
+		super(new VGABuffer);
+
 		this._backend = backend;
 		this._keyboard = keyboard;
 
