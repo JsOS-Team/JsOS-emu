@@ -26,4 +26,6 @@ module.exports = b => {
 	browserOpen(`http://localhost:${port}`);
 
 	new WebSocket.Server({port}).on("connection", handleWebSocket);
+
+	return port;
 }
