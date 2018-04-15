@@ -2,8 +2,6 @@ const API = require("./api");
 
 class Backend {
 	recv(msg) {
-		console.log("Recv", msg);
-
 		if(msg === "begin") {
 			this.app = require("../app");
 			this.api = new API(this);

@@ -1,25 +1,20 @@
 // TODO: don't get port via prompt
-const port = parseInt(prompt("HTTP port:"));
+const port = parseInt(prompt("WebSocket port:"));
+
+
+// Connect to websocket
 let ws = null;
 
-function get(url) {
-	return fetch(`http://localhost:${port}/${url}`)
-		.then(res => res.text());
-}
-
 function connect() {
-	return get("_port")
-		.then(wsPort => {
-			ws = new WebSocket(`ws://localhost:${wsPort}`);
-			ws.onmessage = e => {
-				recv(JSON.parse(e.data));
-			};
+	ws = new WebSocket(`ws://localhost:${port}`);
+	ws.onmessage = e => {
+		recv(JSON.parse(e.data));
+	};
 
-			return new Promise((resolve, reject) => {
-				ws.onopen = resolve;
-				ws.onerror = reject;
-			});
-		});
+	return new Promise((resolve, reject) => {
+		ws.onopen = resolve;
+		ws.onerror = reject;
+	});
 }
 
 function sendWs(msg) {
