@@ -1,4 +1,5 @@
 const WebSocket = require("ws");
+const browserOpen = require("../utils/openBrowser");
 
 let port, backend;
 
@@ -16,6 +17,8 @@ module.exports = b => {
 	// Choose random port, so that noone can steal local files from Web
 	port = Math.floor(Math.random() * 3000) + 2000;
 	console.log("Listening on port " + port);
+
+	browserOpen(`http://localhost:${port}`);
 
 	new WebSocket.Server({port: port}).on("connection", handleWebSocket);
 }
