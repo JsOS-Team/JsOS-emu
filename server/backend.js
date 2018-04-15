@@ -14,7 +14,7 @@ class Backend {
 			global.debug = console.log.bind(console);
 
 			let command = this.app.commands[0];
-			this.app.call(command, "", this.api, this.cb);
+			require("./shell")(this.app, command, this.api, this.cb);
 		} else {
 			this.api.recv(msg);
 		}
