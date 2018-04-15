@@ -29,9 +29,7 @@ class VGABuffer {
 			throw new Error("vga error: offset is out of bounds");
 		}
 
-		let x = offset % this.w;
-		let y = Math.floor(offset / this.w);
-		this._backend.send({action: "setCharXY", x, y, char, fg, bg});
+		this._backend.send({action: "setOffset", offset, char, fg, bg});
 	}
 
 	setXY(u8, x, y, char, fg, bg) {
@@ -41,7 +39,7 @@ class VGABuffer {
 			throw new Error("vga error: y is out of bounds");
 		}
 
-		this._backend.send({action: "setCharXY", x, y, char, fg, bg});
+		this._backend.send({action: "setXY", x, y, char, fg, bg});
 	}
 
 	clear(bg) {
