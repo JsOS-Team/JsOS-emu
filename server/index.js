@@ -19,9 +19,13 @@ function getPort() {
 
 module.exports = b => {
 	const port = getPort()
+	const url = `file:///${__dirname}/../gui/index.html?${port}`;
+
 	backend = b;
 
 	console.log("Listening on port " + port);
+	console.log(url);
+
 
 	browserOpen(`http://localhost:${port}`);
 
