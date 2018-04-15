@@ -21,9 +21,6 @@ const color = {
 };
 
 function setCharAt(table, x, y, char, fg, bg) {
-	bg = bg || "BLACK";
-	fg = fg || "WHITE";
-
 	let td = table.rows[y].cells[x];
 	td.style.backgroundColor = color[bg];
 	td.style.color = color[fg];
@@ -39,6 +36,8 @@ class VGA {
 			let tr = document.createElement("tr");
 			for(let x = 0; x < w; x++) {
 				let td = document.createElement("td");
+				td.style.backgroundColor = color[0];
+				td.style.color = color[15];
 				tr.appendChild(td);
 			}
 			this.table.appendChild(tr);
